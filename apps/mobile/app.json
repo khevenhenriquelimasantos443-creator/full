@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Coleta Full",
+    "slug": "coleta-full",
+    "scheme": "coletafull",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0B1220"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.coletafull.mobile"
+    },
+    "android": {
+      "package": "app.coletafull.mobile"
+    },
+    "plugins": ["expo-secure-store", "expo-web-browser"],
+    "extra": {
+      "apiBaseUrl": "https://coleta-full-backend.workers.dev"
+    }
+  }
+}

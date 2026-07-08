@@ -1,0 +1,31 @@
+name = "coleta-full-backend"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Puxa os envios do dia por conta, de manhã e ao longo do dia.
+# Ajuste conforme o horário em que o código de autorização costuma sair.
+[triggers]
+crons = ["*/15 6-20 * * *"]
+
+# Banco relacional (modelo de dados do escopo §6).
+[[d1_databases]]
+binding = "DB"
+database_name = "coleta_full"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+# Variáveis públicas (não sensíveis). Segredos vão via `wrangler secret put`
+# ou em .dev.vars localmente — ver .dev.vars.example.
+[vars]
+ML_SITE_ID = "MLB"
+ML_API_BASE = "https://api.mercadolibre.com"
+ML_WEB_BASE = "https://myaccount.mercadolivre.com.br"
+ML_AUTH_BASE = "https://auth.mercadolivre.com.br"
+APP_BASE_URL = "https://coleta-full-backend.workers.dev"
+
+# Segredos esperados (configurar antes do deploy):
+#   ML_CLIENT_ID       — client_id da aplicação no Central de Desenvolvedores ML
+#   ML_CLIENT_SECRET   — client_secret (NUNCA vai para o app mobile)
+#   ML_REDIRECT_URI    — redirect_uri registrado no ML (ex: {APP_BASE_URL}/auth/callback)
+#   TOKEN_ENC_KEY      — chave base64 (32 bytes) p/ criptografar tokens/sessão em repouso
+#   SESSION_JWT_SECRET — segredo p/ assinar o token de sessão do app

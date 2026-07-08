@@ -1,0 +1,14 @@
+# Copie para `.dev.vars` (que é git-ignored) e preencha para rodar `wrangler dev`.
+# Em produção, use `wrangler secret put <NOME>` para cada um destes.
+
+# Aplicação criada no Central de Desenvolvedores do Mercado Livre.
+ML_CLIENT_ID="0000000000000000"
+ML_CLIENT_SECRET="troque-por-seu-client-secret"
+ML_REDIRECT_URI="http://localhost:8787/auth/callback"
+
+# Chave de 32 bytes em base64 para criptografia de tokens/sessão em repouso.
+# Gere uma com:  openssl rand -base64 32
+TOKEN_ENC_KEY="troque-por-uma-chave-base64-de-32-bytes"
+
+# Segredo para assinar o token de sessão que o app usa (HMAC).
+SESSION_JWT_SECRET="troque-por-um-segredo-longo-e-aleatorio"

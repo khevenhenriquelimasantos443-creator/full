@@ -1,0 +1,27 @@
+{
+  "name": "@coleta-full/backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend Cloudflare Workers: broker OAuth2 do Mercado Livre, API oficial (Core) e módulo Beta isolado.",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "db:apply:local": "wrangler d1 execute coleta_full --local --file=./src/db/schema.sql",
+    "db:apply:remote": "wrangler d1 execute coleta_full --remote --file=./src/db/schema.sql"
+  },
+  "dependencies": {
+    "hono": "^4.6.14"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "wrangler": "^3.95.0"
+  }
+}
