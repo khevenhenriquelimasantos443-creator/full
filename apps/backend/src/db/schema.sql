@@ -57,6 +57,21 @@ CREATE TABLE IF NOT EXISTS shipment_documents (
   obtido_em    TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Comprovantes de fechamento da coleta (fotos de confirmação).
+-- O binário fica no object storage (R2); aqui guardamos só os metadados.
+CREATE TABLE IF NOT EXISTS collection_proofs (
+  id            TEXT PRIMARY KEY,
+  shipment_id   TEXT NOT NULL REFERENCES full_shipments(id) ON DELETE CASCADE,
+  ml_account_id TEXT NOT NULL REFERENCES ml_accounts(id) ON DELETE CASCADE,
+  storage_key   TEXT NOT NULL,               -- chave do objeto no bucket
+  content_type  TEXT,
+  observacao    TEXT,
+  criado_em     TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_collection_proofs_shipment
+  ON collection_proofs (shipment_id);
+
 -- Detalhes de coleta (Módulo Beta — campos mapeados do JSON real, §1.2).
 CREATE TABLE IF NOT EXISTS collection_details (
   id             TEXT PRIMARY KEY,

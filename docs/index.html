@@ -105,6 +105,14 @@
   .dfield .val { font-size: 15px; margin-top: 2px; }
   .beta-tag { display: inline-block; background: var(--warning); color: #1a1206; font-size: 10px; font-weight: 800; border-radius: 6px; padding: 2px 7px; margin-left: 8px; vertical-align: middle; }
   .doc-text { color: var(--muted); font-size: 12px; line-height: 1.5; margin-bottom: 12px; }
+  .proof-status { font-size: 12.5px; line-height: 1.5; margin-bottom: 12px; color: var(--muted); }
+  .proof-status.done { color: var(--accent); font-weight: 600; }
+  .proof-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+  .proof-grid:empty { display: none; }
+  .proof-thumb { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); background: var(--surface-alt); }
+  .proof-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .proof-thumb .rm { position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; border-radius: 999px; border: 0; background: rgba(5,8,15,.72); color: #fff; font-size: 13px; line-height: 20px; text-align: center; cursor: pointer; padding: 0; }
+  .ship .pill.closed { background: color-mix(in srgb, var(--accent) 22%, transparent); }
 
   .set-row { margin: 0 14px 10px; padding: 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
   .set-row .t { font-weight: 600; font-size: 15px; }
@@ -168,6 +176,14 @@
         <div class="doc-text">Nota Fiscal (NF-e) e Autorização de Entrada saem da plataforma. Abra a página oficial para baixar e compartilhar.</div>
         <button class="btn btn-primary" id="open-ml" style="margin-top:0">Abrir no Mercado Livre</button>
       </div>
+
+      <div class="section-title" style="font-size:15px">Confirmação de fechamento</div>
+      <div class="dcard">
+        <div class="proof-status" id="proof-status">Nenhuma foto ainda. Anexe a confirmação do fechamento da coleta.</div>
+        <div class="proof-grid" id="proof-gallery"></div>
+        <input type="file" id="proof-input" accept="image/*" capture="environment" multiple hidden />
+        <button class="btn btn-primary" id="add-proof" style="margin-top:0">📷 Adicionar foto de confirmação</button>
+      </div>
       <div style="height: 14px"></div>
     </div>
 
@@ -200,6 +216,7 @@
   ];
 
   let active = 0, current = null;
+  const proofs = {}; // { [shipmentId]: [{ url, ts }] }
   const $ = (id) => document.getElementById(id);
 
   function show(screen) {
@@ -218,11 +235,16 @@
     $("code-val").textContent = acc.code;
     const ships = [...acc.shipments].sort((a, b) => a.time.localeCompare(b.time));
     $("home-count").textContent = `Envios de hoje (${ships.length})`;
-    $("ship-list").innerHTML = ships.map((s) => `
+    $("ship-list").innerHTML = ships.map((s) => {
+      const n = (proofs[s.id] || []).length;
+      const pill = n ? `<span class="pill closed">Fechada ✓</span>` : `<span class="pill">${s.status}</span>`;
+      const proofMeta = n ? ` · 📷 ${n}` : "";
+      return `
       <div class="ship" data-id="${s.id}">
-        <div class="row"><span class="name">${s.name}</span><span class="pill">${s.status}</span></div>
-        <div class="meta">ID ${s.id} · ${s.volumes} volumes · ${s.time}</div>
-      </div>`).join("");
+        <div class="row"><span class="name">${s.name}</span>${pill}</div>
+        <div class="meta">ID ${s.id} · ${s.volumes} volumes · ${s.time}${proofMeta}</div>
+      </div>`;
+    }).join("");
     $("ship-list").querySelectorAll(".ship").forEach((el) => el.onclick = () => openDetail(+el.dataset.id));
   }
   function openDetail(id) {
@@ -239,7 +261,35 @@
       <div class="dfield"><div class="k">Motorista</div><div class="val">${current.motorista}</div></div>
       <div class="dfield"><div class="k">Placa</div><div class="val">${current.placa}</div></div>
       <div class="dfield"><div class="k">Janela de horário</div><div class="val">${current.janela}</div></div>`;
+    renderProofs();
     show("detail");
+  }
+  function renderProofs() {
+    const list = proofs[current.id] || [];
+    const status = $("proof-status");
+    if (list.length) {
+      status.textContent = `Coleta fechada ✓ · ${list.length} foto(s) anexada(s)`;
+      status.classList.add("done");
+    } else {
+      status.textContent = "Nenhuma foto ainda. Anexe a confirmação do fechamento da coleta.";
+      status.classList.remove("done");
+    }
+    $("proof-gallery").innerHTML = list.map((p, i) => `
+      <div class="proof-thumb"><img src="${p.url}" alt="comprovante" /><button class="rm" data-i="${i}" title="remover">×</button></div>`).join("");
+    $("proof-gallery").querySelectorAll(".rm").forEach((b) => b.onclick = (e) => {
+      e.stopPropagation();
+      list.splice(+b.dataset.i, 1);
+      renderProofs();
+    });
+  }
+  function addProofFiles(files) {
+    if (!files || !files.length) return;
+    proofs[current.id] = proofs[current.id] || [];
+    for (const f of files) {
+      proofs[current.id].push({ url: URL.createObjectURL(f), ts: Date.now() });
+    }
+    renderProofs();
+    toast("Confirmação anexada ✓");
   }
   function renderSettings() {
     $("set-accounts").innerHTML = accounts.map((a) => `
@@ -260,6 +310,8 @@
   $("force").onclick = () => toast("Atualizado ✓");
   $("code-val").onclick = copyCode;
   $("open-ml").onclick = () => window.open(`https://myaccount.mercadolivre.com.br/shipping/inbounds/${current.id}/details`, "_blank");
+  $("add-proof").onclick = () => $("proof-input").click();
+  $("proof-input").onchange = (e) => { addProofFiles(e.target.files); e.target.value = ""; };
 </script>
 </body>
 </html>

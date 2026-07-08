@@ -14,6 +14,13 @@ binding = "DB"
 database_name = "coleta_full"
 database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
 
+# Armazenamento das fotos de confirmação de fechamento da coleta.
+# Crie com: npx wrangler r2 bucket create coleta-full-proofs
+# e descomente:
+# [[r2_buckets]]
+# binding = "PROOFS_BUCKET"
+# bucket_name = "coleta-full-proofs"
+
 # Variáveis públicas (não sensíveis). Segredos vão via `wrangler secret put`
 # ou em .dev.vars localmente — ver .dev.vars.example.
 [vars]

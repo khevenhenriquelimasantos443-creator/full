@@ -277,6 +277,67 @@ export class Repo {
     return results ?? [];
   }
 
+  /** Resolve o id interno do envio a partir do inboundId (dentro da conta). */
+  async getShipmentIdByInbound(
+    mlAccountId: string,
+    inboundId: number,
+  ): Promise<string | null> {
+    const row = await this.db
+      .prepare(
+        "SELECT id FROM full_shipments WHERE ml_account_id = ? AND inbound_id = ?",
+      )
+      .bind(mlAccountId, inboundId)
+      .first<{ id: string }>();
+    return row?.id ?? null;
+  }
+
+  // ---- collection_proofs (fotos de fechamento) --------------------------
+
+  async saveCollectionProof(params: {
+    shipmentId: string;
+    mlAccountId: string;
+    storageKey: string;
+    contentType?: string;
+    observacao?: string;
+  }): Promise<string> {
+    const id = uuid();
+    await this.db
+      .prepare(
+        `INSERT INTO collection_proofs
+           (id, shipment_id, ml_account_id, storage_key, content_type, observacao)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(
+        id,
+        params.shipmentId,
+        params.mlAccountId,
+        params.storageKey,
+        params.contentType ?? null,
+        params.observacao ?? null,
+      )
+      .run();
+    return id;
+  }
+
+  async listCollectionProofs(shipmentId: string): Promise<
+    Array<{
+      id: string;
+      storage_key: string;
+      content_type: string | null;
+      observacao: string | null;
+      criado_em: string;
+    }>
+  > {
+    const { results } = await this.db
+      .prepare(
+        `SELECT id, storage_key, content_type, observacao, criado_em
+           FROM collection_proofs WHERE shipment_id = ? ORDER BY criado_em DESC`,
+      )
+      .bind(shipmentId)
+      .all<any>();
+    return results ?? [];
+  }
+
   // ---- daily_auth_codes --------------------------------------------------
 
   async saveDailyAuthCode(params: {

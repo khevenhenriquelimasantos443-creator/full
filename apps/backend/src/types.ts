@@ -9,6 +9,10 @@
 export interface Env {
   DB: D1Database;
 
+  // Bucket R2 para as fotos de confirmação de fechamento da coleta (opcional:
+  // se ausente, os endpoints de fotos respondem 501).
+  PROOFS_BUCKET?: R2Bucket;
+
   // vars públicas
   ML_SITE_ID: string;
   ML_API_BASE: string;
