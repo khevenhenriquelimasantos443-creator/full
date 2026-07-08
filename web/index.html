@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Coleta Full — demonstração</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="App de gestão de envios Full do Mercado Livre — versão de demonstração." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>" />
+<style>
+  :root {
+    --paper: #0c1017;
+    --page-ink: #e8ecf3;
+    --page-muted: #9aa6ba;
+    --bg: #0b1220;
+    --surface: #141c2b;
+    --surface-alt: #1c2739;
+    --border: #26324a;
+    --text: #f2f5fa;
+    --muted: #98a4bc;
+    --primary: #3b82f6;
+    --accent: #22d3a6;
+    --warning: #f5a524;
+    --danger: #f04438;
+    --code: #0e7c66;
+  }
+  :root[data-theme="light"] { --paper: #eef1f6; --page-ink: #141a24; --page-muted: #56617a; }
+  @media (prefers-color-scheme: light) { :root { --paper: #eef1f6; --page-ink: #141a24; --page-muted: #56617a; } }
+  :root[data-theme="dark"] { --paper: #0c1017; --page-ink: #e8ecf3; --page-muted: #9aa6ba; }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: radial-gradient(120% 60% at 50% -10%, color-mix(in srgb, var(--primary) 12%, var(--paper)) 0%, var(--paper) 55%);
+    color: var(--page-ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex; flex-direction: column; align-items: center; min-height: 100%;
+  }
+  .head { text-align: center; padding: 22px 16px 6px; max-width: 560px; }
+  .head h1 { margin: 0 0 4px; font-size: 18px; letter-spacing: -.01em; }
+  .head p { margin: 0; color: var(--page-muted); font-size: 13.5px; }
+  .head .badge { display: inline-block; margin-top: 8px; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 999px; padding: 3px 10px; letter-spacing: .03em; }
+
+  .phone {
+    width: 340px; max-width: 100%; height: min(720px, 86vh); margin: 14px auto 26px;
+    background: var(--bg); border-radius: 38px; border: 1px solid var(--border);
+    box-shadow: 0 30px 60px -26px rgba(2,8,20,.75), 0 10px 24px -14px rgba(2,8,20,.6);
+    position: relative; overflow: hidden; display: flex; flex-direction: column; color: var(--text); font-size: 13px;
+  }
+  @media (max-width: 380px) { .phone { border-radius: 0; height: 100vh; margin: 8px 0 0; border-left: 0; border-right: 0; } }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 26px; background: #05080f; border-radius: 0 0 14px 14px; z-index: 20; }
+  .statusbar { display: flex; justify-content: space-between; align-items: center; padding: 9px 20px 6px; color: var(--muted); font-size: 11px; font-weight: 600; flex: 0 0 auto; }
+
+  .screen { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+  .screen::-webkit-scrollbar { width: 0; }
+  .hidden { display: none !important; }
+
+  .login { height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 0 22px 30px; }
+  .brandmark { font-size: 32px; font-weight: 800; letter-spacing: -.02em; }
+  .login .sub { color: var(--muted); font-size: 13.5px; margin: 8px 0 24px; line-height: 1.5; }
+  .field { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; color: var(--muted); font-size: 14px; }
+  .btn { border: 0; width: 100%; font-family: inherit; cursor: pointer; }
+  .btn-primary { background: var(--primary); color: #fff; text-align: center; font-weight: 700; padding: 15px; border-radius: 12px; margin-top: 14px; font-size: 14.5px; }
+  .divider { display: flex; align-items: center; gap: 10px; margin: 18px 0; color: var(--muted); font-size: 12px; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .btn-demo { text-align: center; font-weight: 700; padding: 15px; border-radius: 12px; font-size: 14.5px; background: var(--surface); border: 1px solid var(--border); color: var(--text); animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 30%, transparent); } 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 0%, transparent); } }
+  @media (prefers-reduced-motion: reduce) { .btn-demo { animation: none; } }
+  .demo-hint { text-align: center; color: var(--muted); font-size: 11.5px; margin-top: 9px; }
+  .legal { color: var(--muted); font-size: 11.5px; margin-top: 20px; line-height: 1.5; }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 6px 16px 10px; }
+  .app-date { color: var(--muted); font-weight: 600; }
+  .app-link { color: var(--primary); font-weight: 600; cursor: pointer; }
+  .chips { display: flex; gap: 8px; padding: 0 14px 12px; flex-wrap: wrap; }
+  .chip { padding: 7px 13px; border-radius: 20px; font-size: 12px; font-weight: 600; background: var(--surface); border: 1px solid var(--border); color: var(--muted); cursor: pointer; white-space: nowrap; }
+  .chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+  .codecard { margin: 0 14px 12px; background: var(--code); border-radius: 20px; padding: 16px; }
+  .codecard .lab { display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.86); font-weight: 700; }
+  .codecard .acc { font-size: 11px; color: rgba(255,255,255,.72); text-transform: none; letter-spacing: 0; }
+  .code { text-align: center; font-size: 44px; font-weight: 800; letter-spacing: 6px; color: #fff; padding: 14px 0 2px; font-variant-numeric: tabular-nums; cursor: pointer; user-select: all; }
+  .code-hint { text-align: center; color: rgba(255,255,255,.8); font-size: 12px; }
+  .codecard .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+  .codecard .foot .v { font-size: 11.5px; color: rgba(255,255,255,.85); }
+  .codecard .foot .rbtn { background: rgba(255,255,255,.18); color: #fff; font-size: 11.5px; font-weight: 600; padding: 7px 11px; border-radius: 8px; cursor: pointer; border: 0; font-family: inherit; }
+
+  .betanotice { margin: 0 14px 12px; padding: 9px 11px; border-radius: 8px; background: var(--surface-alt); border-left: 3px solid var(--warning); color: var(--muted); font-size: 11px; line-height: 1.45; }
+  .section-title { padding: 4px 16px 10px; font-size: 16px; font-weight: 700; }
+
+  .ship { margin: 0 14px 10px; padding: 13px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); cursor: pointer; }
+  .ship:active { background: var(--surface-alt); }
+  .ship .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .ship .name { font-weight: 700; font-size: 14px; }
+  .ship .pill { background: var(--surface-alt); color: var(--accent); font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 8px; white-space: nowrap; }
+  .ship .meta { color: var(--muted); font-size: 12px; margin-top: 6px; }
+
+  .dhead { display: flex; align-items: center; gap: 10px; padding: 6px 14px 12px; font-weight: 600; }
+  .dhead .back { color: var(--primary); font-size: 22px; cursor: pointer; line-height: 1; }
+  .dtitle { font-size: 21px; font-weight: 800; padding: 0 16px 12px; }
+  .dcard { margin: 0 14px 12px; padding: 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); }
+  .dfield { margin-bottom: 12px; }
+  .dfield:last-child { margin-bottom: 0; }
+  .dfield .k { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
+  .dfield .val { font-size: 15px; margin-top: 2px; }
+  .beta-tag { display: inline-block; background: var(--warning); color: #1a1206; font-size: 10px; font-weight: 800; border-radius: 6px; padding: 2px 7px; margin-left: 8px; vertical-align: middle; }
+  .doc-text { color: var(--muted); font-size: 12px; line-height: 1.5; margin-bottom: 12px; }
+
+  .set-row { margin: 0 14px 10px; padding: 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .set-row .t { font-weight: 600; font-size: 15px; }
+  .set-row .m { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .btn-out { margin: 6px 14px 0; text-align: center; font-weight: 700; padding: 13px; border-radius: 12px; background: var(--surface-alt); color: var(--danger); cursor: pointer; }
+
+  .toast { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: #05213a; color: #eaf2ff; border: 1px solid var(--primary); padding: 10px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 30; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .footer { color: var(--page-muted); font-size: 12px; text-align: center; padding: 0 16px 26px; max-width: 520px; }
+  .footer a { color: var(--primary); }
+</style>
+</head>
+<body>
+  <div class="head">
+    <h1>Coleta Full — app funcionando</h1>
+    <p>App de verdade, clicável, com dados de exemplo. Toque em “Entrar em modo demonstração”.</p>
+    <span class="badge">MODO DEMONSTRAÇÃO · dados fictícios</span>
+  </div>
+
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar"><span>9:41</span><span id="sb-title">Coleta Full</span><span>100%</span></div>
+
+    <div class="screen" id="screen-login">
+      <div class="login">
+        <div class="brandmark">Coleta Full</div>
+        <div class="sub">Seus envios Full do dia e o código de autorização, sempre à mão.</div>
+        <div class="field">seu@email.com</div>
+        <button class="btn btn-primary" id="btn-ml">Conectar conta Mercado Livre</button>
+        <div class="divider">ou</div>
+        <button class="btn btn-demo" id="btn-demo">Entrar em modo demonstração</button>
+        <div class="demo-hint">Explore o app com dados de exemplo — sem conta, sem login.</div>
+        <div class="legal">Você autoriza o acesso à sua própria conta via OAuth oficial do Mercado Livre. Não pedimos sua senha.</div>
+      </div>
+    </div>
+
+    <div class="screen hidden" id="screen-home">
+      <div class="topbar"><span class="app-date" id="home-date">08/07/2026</span><span class="app-link" id="go-settings">Ajustes</span></div>
+      <div class="chips" id="chips"></div>
+      <div class="codecard">
+        <div class="lab"><span>Código de autorização de hoje</span><span class="acc" id="code-acc">—</span></div>
+        <div class="code" id="code-val">------</div>
+        <div class="code-hint" id="code-hint">toque para copiar</div>
+        <div class="foot"><span class="v">Válido por ~24h</span><button class="rbtn" id="force">Forçar atualização</button></div>
+      </div>
+      <div class="betanotice">⚠️ Dados obtidos de forma não-oficial da interface do Mercado Livre. Podem atrasar ou falhar se a plataforma mudar o layout.</div>
+      <div class="section-title" id="home-count">Envios de hoje</div>
+      <div id="ship-list"></div>
+      <div style="height: 14px"></div>
+    </div>
+
+    <div class="screen hidden" id="screen-detail">
+      <div class="dhead"><span class="back" id="detail-back">‹</span><span>Detalhe do envio</span></div>
+      <div class="dtitle" id="d-title">—</div>
+      <div class="dcard" id="d-core"></div>
+      <div class="section-title" style="font-size:15px">Coleta <span class="beta-tag">BETA</span></div>
+      <div class="dcard" id="d-beta"></div>
+      <div class="section-title" style="font-size:15px">Documentos</div>
+      <div class="dcard">
+        <div class="doc-text">Nota Fiscal (NF-e) e Autorização de Entrada saem da plataforma. Abra a página oficial para baixar e compartilhar.</div>
+        <button class="btn btn-primary" id="open-ml" style="margin-top:0">Abrir no Mercado Livre</button>
+      </div>
+      <div style="height: 14px"></div>
+    </div>
+
+    <div class="screen hidden" id="screen-settings">
+      <div class="dhead"><span class="back" id="settings-back">‹</span><span>Ajustes</span></div>
+      <div class="section-title" style="font-size:15px">Contas conectadas</div>
+      <div id="set-accounts"></div>
+      <div class="section-title" style="font-size:15px">Sessão</div>
+      <div class="btn-out" id="sign-out">Sair</div>
+      <div style="height: 14px"></div>
+    </div>
+
+    <div class="toast" id="toast">Copiado ✓</div>
+  </div>
+
+  <div class="footer">
+    Versão web de demonstração (o app real é React Native/Expo). Código-fonte completo —
+    backend Cloudflare Workers + app Expo — no repositório.
+  </div>
+
+<script>
+  const accounts = [
+    { name: "Bem Barato (demo)", code: "A8489FE6", shipments: [
+      { id: 71190233, name: "Kit Skincare Verão", volumes: 18, time: "14:30", status: "Em coleta", statusRaw: "confirmed", motorista: "Marcos Antônio Pereira", placa: "FKR2A18", transportadora: "Loggi", janela: "13:00 – 15:00" },
+      { id: 71182418, name: "TRUSS", volumes: 36, time: "18:00", status: "Agendado", statusRaw: "confirmed", motorista: "Geovani Santos Silva", placa: "GIM6J64", transportadora: "JM Transportes", janela: "10:54 – 12:54" },
+    ]},
+    { name: "SOFT UP (demo)", code: "B7723C10", shipments: [
+      { id: 68450912, name: "Fones Bluetooth XZ", volumes: 60, time: "16:00", status: "Agendado", statusRaw: "confirmed", motorista: "Rafael Lima Costa", placa: "HJP7D22", transportadora: "Total Express", janela: "15:30 – 17:30" },
+    ]},
+  ];
+
+  let active = 0, current = null;
+  const $ = (id) => document.getElementById(id);
+
+  function show(screen) {
+    ["login", "home", "detail", "settings"].forEach((s) => $("screen-" + s).classList.toggle("hidden", s !== screen));
+    $("screen-" + screen).scrollTop = 0;
+  }
+  function toast(msg) {
+    const t = $("toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("show"), 1400);
+  }
+  function renderHome() {
+    const acc = accounts[active];
+    $("chips").innerHTML = accounts.map((a, i) => `<span class="chip ${i === active ? "active" : ""}" data-i="${i}">${a.name}</span>`).join("");
+    $("chips").querySelectorAll(".chip").forEach((el) => el.onclick = () => { active = +el.dataset.i; renderHome(); });
+    $("code-acc").textContent = acc.name.replace(" (demo)", "");
+    $("code-val").textContent = acc.code;
+    const ships = [...acc.shipments].sort((a, b) => a.time.localeCompare(b.time));
+    $("home-count").textContent = `Envios de hoje (${ships.length})`;
+    $("ship-list").innerHTML = ships.map((s) => `
+      <div class="ship" data-id="${s.id}">
+        <div class="row"><span class="name">${s.name}</span><span class="pill">${s.status}</span></div>
+        <div class="meta">ID ${s.id} · ${s.volumes} volumes · ${s.time}</div>
+      </div>`).join("");
+    $("ship-list").querySelectorAll(".ship").forEach((el) => el.onclick = () => openDetail(+el.dataset.id));
+  }
+  function openDetail(id) {
+    const acc = accounts[active];
+    current = acc.shipments.find((s) => s.id === id);
+    $("d-title").textContent = current.name;
+    $("d-core").innerHTML = `
+      <div class="dfield"><div class="k">ID do envio</div><div class="val">${current.id}</div></div>
+      <div class="dfield"><div class="k">Status</div><div class="val">${current.statusRaw}</div></div>
+      <div class="dfield"><div class="k">Volumes</div><div class="val">${current.volumes}</div></div>
+      <div class="dfield"><div class="k">Coleta agendada</div><div class="val">08/07/2026 ${current.time}</div></div>`;
+    $("d-beta").innerHTML = `
+      <div class="dfield"><div class="k">Transportadora</div><div class="val">${current.transportadora}</div></div>
+      <div class="dfield"><div class="k">Motorista</div><div class="val">${current.motorista}</div></div>
+      <div class="dfield"><div class="k">Placa</div><div class="val">${current.placa}</div></div>
+      <div class="dfield"><div class="k">Janela de horário</div><div class="val">${current.janela}</div></div>`;
+    show("detail");
+  }
+  function renderSettings() {
+    $("set-accounts").innerHTML = accounts.map((a) => `
+      <div class="set-row"><div><div class="t">${a.name}</div><div class="m">MLB · ativa</div></div></div>`).join("");
+  }
+  function copyCode() {
+    const code = accounts[active].code;
+    try { navigator.clipboard && navigator.clipboard.writeText(code); } catch (e) {}
+    toast("Código copiado ✓");
+  }
+
+  $("btn-demo").onclick = () => { $("sb-title").textContent = "Início"; renderHome(); show("home"); };
+  $("btn-ml").onclick = () => toast("No app real, isto abre o login do Mercado Livre");
+  $("go-settings").onclick = () => { renderSettings(); show("settings"); };
+  $("settings-back").onclick = () => show("home");
+  $("detail-back").onclick = () => show("home");
+  $("sign-out").onclick = () => show("login");
+  $("force").onclick = () => toast("Atualizado ✓");
+  $("code-val").onclick = copyCode;
+  $("open-ml").onclick = () => window.open(`https://myaccount.mercadolivre.com.br/shipping/inbounds/${current.id}/details`, "_blank");
+</script>
+</body>
+</html>
