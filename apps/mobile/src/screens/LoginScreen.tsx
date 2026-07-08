@@ -25,7 +25,23 @@ export function LoginScreen() {
   const { api, signIn } = useApp();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
+  const [demoBusy, setDemoBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const enterDemo = async () => {
+    setError(null);
+    setDemoBusy(true);
+    try {
+      const session = await api.demoLogin();
+      await signIn(session);
+    } catch {
+      setError(
+        "Modo demonstração indisponível. Confirme que o backend está no ar com DEMO_MODE=true.",
+      );
+    } finally {
+      setDemoBusy(false);
+    }
+  };
 
   const connect = async () => {
     if (!email.includes("@")) {
@@ -88,6 +104,27 @@ export function LoginScreen() {
           )}
         </Pressable>
 
+        <View style={styles.divider}>
+          <View style={styles.line} />
+          <Text style={styles.dividerText}>ou</Text>
+          <View style={styles.line} />
+        </View>
+
+        <Pressable
+          style={styles.demoButton}
+          onPress={enterDemo}
+          disabled={demoBusy}
+        >
+          {demoBusy ? (
+            <ActivityIndicator color={colors.text} />
+          ) : (
+            <Text style={styles.demoButtonText}>Entrar em modo demonstração</Text>
+          )}
+        </Pressable>
+        <Text style={styles.demoHint}>
+          Explore o app com dados de exemplo — sem conta, sem login.
+        </Text>
+
         <Text style={styles.legal}>
           Você autoriza o acesso à sua própria conta via OAuth oficial do
           Mercado Livre. Não pedimos sua senha.
@@ -121,5 +158,27 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   buttonText: { color: colors.primaryText, fontSize: 16, fontWeight: "700" },
+  divider: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: spacing.lg,
+  },
+  line: { flex: 1, height: 1, backgroundColor: colors.border },
+  dividerText: { color: colors.textMuted, marginHorizontal: spacing.md, fontSize: 13 },
+  demoButton: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    paddingVertical: spacing.lg,
+    alignItems: "center",
+  },
+  demoButtonText: { color: colors.text, fontSize: 16, fontWeight: "700" },
+  demoHint: {
+    color: colors.textMuted,
+    fontSize: 12,
+    marginTop: spacing.sm,
+    textAlign: "center",
+  },
   legal: { color: colors.textMuted, fontSize: 12, marginTop: spacing.lg, lineHeight: 17 },
 });

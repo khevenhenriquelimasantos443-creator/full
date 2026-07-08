@@ -59,27 +59,39 @@ docs/
   escopo.md   Escopo completo do produto (v1.0)
 ```
 
-## Começando
+## Testar agora (modo demonstração) — um comando
 
-Cada app tem seu próprio README com instruções detalhadas:
+Quer só **ver o app funcionando**, sem Mercado Livre, sem login, sem configurar
+nada? Rode:
+
+```bash
+./start.sh
+```
+
+Ele instala tudo, sobe o backend com **dados de exemplo** e abre o app no
+navegador. Quando abrir, clique em **"Entrar em modo demonstração"** — você verá
+o código de autorização do dia (`A8489FE6`), a lista de envios (TRUSS, etc.),
+duas contas para trocar e as telas de detalhe e ajustes. Para parar: `Ctrl+C`.
+
+> Precisa só do Node.js 18+ instalado. Na primeira vez demora um pouco baixando
+> as dependências.
+
+Prefere no **celular**? Rode `./start.sh`, e no app rode `npm --workspace
+apps/mobile run start` apontando `EXPO_PUBLIC_API_BASE_URL` para o IP da sua
+máquina; abra no app **Expo Go**. (O modo web acima é o caminho mais rápido.)
+
+## Conectar sua conta real do Mercado Livre
+
+O modo demonstração usa dados fictícios. Para puxar seus envios de verdade, há
+alguns passos únicos que só você pode fazer (são suas credenciais) — o passo a
+passo está em [`apps/backend/README.md`](apps/backend/README.md): criar o app no
+Central de Desenvolvedores do ML e, para o código de autorização (Módulo Beta),
+fornecer a sessão da conta uma vez.
+
+## Documentação por app
 
 - Backend: [`apps/backend/README.md`](apps/backend/README.md)
 - Mobile: [`apps/mobile/README.md`](apps/mobile/README.md)
-
-Início rápido:
-
-```bash
-# Backend
-cd apps/backend
-npm install
-npm test            # roda os testes do parser Nordic e utilitários
-npm run dev         # sobe o Worker localmente (wrangler)
-
-# Mobile
-cd apps/mobile
-npm install
-npm start           # abre o Expo
-```
 
 ## Estado atual (Fase 1 — MVP interno)
 

@@ -11,7 +11,9 @@ import type {
   ShipmentsResponse,
 } from "./types";
 
+// Prioridade: variável de ambiente (usada pelo script de demo) → app.json → local.
 const API_BASE =
+  process.env.EXPO_PUBLIC_API_BASE_URL ??
   (Constants.expoConfig?.extra?.apiBaseUrl as string) ??
   "http://localhost:8787";
 
@@ -37,6 +39,16 @@ export class ApiClient {
 
   authorizeUrl(email: string): string {
     return `${API_BASE}/auth/ml/start?email=${encodeURIComponent(email)}`;
+  }
+
+  /** Modo demonstração: retorna um session token com dados de exemplo. */
+  async demoLogin(): Promise<string> {
+    const res = await fetch(`${API_BASE}/auth/demo`);
+    if (!res.ok) {
+      throw new ApiError("modo demonstração indisponível", res.status);
+    }
+    const json = (await res.json()) as { session: string };
+    return json.session;
   }
 
   private async request<T>(path: string, init: RequestInit = {}): Promise<T> {

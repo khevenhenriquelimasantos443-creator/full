@@ -19,6 +19,9 @@
     "android": {
       "package": "app.coletafull.mobile"
     },
+    "web": {
+      "bundler": "metro"
+    },
     "plugins": ["expo-secure-store", "expo-web-browser"],
     "extra": {
       "apiBaseUrl": "https://coleta-full-backend.workers.dev"

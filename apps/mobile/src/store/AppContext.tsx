@@ -11,7 +11,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import * as SecureStore from "expo-secure-store";
+import { getItem, setItem, deleteItem } from "../lib/storage";
 import { ApiClient } from "../api/client";
 import type { Account } from "../api/types";
 
@@ -42,7 +42,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     () =>
       new ApiClient(token, () => {
         // 401 ⇒ derruba a sessão para forçar reconexão.
-        void SecureStore.deleteItemAsync(SESSION_KEY);
+        void deleteItem(SESSION_KEY);
         setToken(null);
       }),
     [token],
@@ -61,7 +61,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Bootstrap: recupera sessão salva.
   useEffect(() => {
     (async () => {
-      const saved = await SecureStore.getItemAsync(SESSION_KEY);
+      const saved = await getItem(SESSION_KEY);
       if (saved) setToken(saved);
       setReady(true);
     })();
@@ -77,7 +77,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       const { accounts: list } = await api.listAccounts();
       setAccounts(list);
-      const savedId = await SecureStore.getItemAsync(ACTIVE_ACCOUNT_KEY);
+      const savedId = await getItem(ACTIVE_ACCOUNT_KEY);
       setActiveAccountState(
         list.find((a) => a.id === savedId) ?? list[0] ?? null,
       );
@@ -87,20 +87,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [token, api]);
 
   const signIn = useCallback(async (newToken: string) => {
-    await SecureStore.setItemAsync(SESSION_KEY, newToken);
+    await setItem(SESSION_KEY, newToken);
     setToken(newToken);
   }, []);
 
   const signOut = useCallback(async () => {
-    await SecureStore.deleteItemAsync(SESSION_KEY);
-    await SecureStore.deleteItemAsync(ACTIVE_ACCOUNT_KEY);
+    await deleteItem(SESSION_KEY);
+    await deleteItem(ACTIVE_ACCOUNT_KEY);
     setToken(null);
     setAccounts([]);
     setActiveAccountState(null);
   }, []);
 
   const setActiveAccount = useCallback(async (account: Account) => {
-    await SecureStore.setItemAsync(ACTIVE_ACCOUNT_KEY, account.id);
+    await setItem(ACTIVE_ACCOUNT_KEY, account.id);
     setActiveAccountState(account);
   }, []);
 

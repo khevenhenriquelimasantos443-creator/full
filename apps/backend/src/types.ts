@@ -22,6 +22,9 @@ export interface Env {
   ML_REDIRECT_URI: string;
   TOKEN_ENC_KEY: string;
   SESSION_JWT_SECRET: string;
+
+  // "true" liga o modo demonstração (dados de exemplo, sem ML/OAuth/cookie).
+  DEMO_MODE?: string;
 }
 
 /** Confiabilidade de um dado do Módulo Beta. */

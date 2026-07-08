@@ -15,6 +15,7 @@ import { Repo } from "../db/repo";
 import { encryptSecret, decryptSecret } from "../lib/crypto";
 import { issueSession } from "../lib/session";
 import { generateCodeVerifier, codeChallengeS256 } from "../lib/pkce";
+import { ensureDemoData } from "../db/seed";
 import {
   buildAuthorizeUrl,
   exchangeCodeForToken,
@@ -31,6 +32,19 @@ const STATE_TTL_MS = 10 * 60 * 1000;
 const APP_DEEP_LINK = "coletafull://auth";
 
 export const authRoutes = new Hono<{ Bindings: Env }>();
+
+/**
+ * Modo demonstração: semeia dados de exemplo e devolve um session token, sem
+ * Mercado Livre / OAuth / cookie. Só funciona com DEMO_MODE = "true".
+ */
+authRoutes.get("/demo", async (c) => {
+  if (c.env.DEMO_MODE !== "true") {
+    return c.json({ error: "modo demonstração desativado" }, 404);
+  }
+  const userId = await ensureDemoData(c.env);
+  const session = await issueSession(userId, c.env.SESSION_JWT_SECRET);
+  return c.json({ session, mode: "demo" });
+});
 
 /** Inicia o fluxo: gera PKCE + state e redireciona ao Mercado Livre. */
 authRoutes.get("/ml/start", async (c) => {

@@ -12,3 +12,6 @@ TOKEN_ENC_KEY="troque-por-uma-chave-base64-de-32-bytes"
 
 # Segredo para assinar o token de sessão que o app usa (HMAC).
 SESSION_JWT_SECRET="troque-por-um-segredo-longo-e-aleatorio"
+
+# Liga o modo demonstração (dados de exemplo, sem ML). Deixe "true" para testar.
+DEMO_MODE="true"

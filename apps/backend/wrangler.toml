@@ -22,6 +22,9 @@ ML_API_BASE = "https://api.mercadolibre.com"
 ML_WEB_BASE = "https://myaccount.mercadolivre.com.br"
 ML_AUTH_BASE = "https://auth.mercadolivre.com.br"
 APP_BASE_URL = "https://coleta-full-backend.workers.dev"
+# "true" liga o modo demonstração. Em produção mantenha "false".
+# Localmente, o .dev.vars (criado pelo script start.sh) sobrescreve para "true".
+DEMO_MODE = "false"
 
 # Segredos esperados (configurar antes do deploy):
 #   ML_CLIENT_ID       — client_id da aplicação no Central de Desenvolvedores ML
