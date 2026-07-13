@@ -55,9 +55,23 @@ Dois módulos, separados de propósito:
 apps/
   backend/    Cloudflare Worker (Hono + D1) — API que o app consome
   mobile/     App Expo / React Native
+  extension/  Extensão de navegador (coletor do Módulo Beta)
 docs/
+  index.html  Site de demonstração (GitHub Pages)
   escopo.md   Escopo completo do produto (v1.0)
 ```
+
+### Duas formas de obter os dados não-oficiais (Módulo Beta)
+
+O código de autorização e os dados do motorista não têm API oficial. Há dois
+caminhos, e o segundo é o recomendado por ser mais seguro:
+
+1. **Backend com sessão de cookie** (`apps/backend`, `services/beta.ts`) — o
+   servidor mantém a sessão e lê o site. Funciona, mas é frágil (sessão expira)
+   e mais arriscado.
+2. **Extensão de navegador** (`apps/extension`) — **recomendado**. Roda na sua
+   sessão logada, lê os dados e envia ao backend (`POST /ingest/beta`). Sem
+   sessão no servidor, sem raspagem no servidor. Ver `apps/extension/README.md`.
 
 ## Testar agora (modo demonstração) — um comando
 

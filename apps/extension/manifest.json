@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Coleta Full — Coletor",
+  "version": "1.0.0",
+  "description": "Lê os envios Full do dia e o código de autorização da sua conta Mercado Livre (na sua própria sessão) e mostra no popup — opcionalmente envia para o app.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "https://myaccount.mercadolivre.com.br/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Coleta Full"
+  },
+  "options_page": "options.html"
+}

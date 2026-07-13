@@ -16,6 +16,7 @@ import { accountRoutes } from "./routes/accounts";
 import { shipmentRoutes } from "./routes/shipments";
 import { betaRoutes } from "./routes/beta";
 import { proofRoutes } from "./routes/proofs";
+import { ingestRoutes } from "./routes/ingest";
 import type { AuthVars } from "./routes/middleware";
 
 const app = new Hono<{ Bindings: Env; Variables: AuthVars }>();
@@ -29,6 +30,7 @@ app.route("/accounts", accountRoutes);
 app.route("/shipments", shipmentRoutes);
 app.route("/beta", betaRoutes);
 app.route("/proofs", proofRoutes);
+app.route("/ingest", ingestRoutes);
 
 app.onError((err, c) => {
   // Nunca logar tokens/cookies — apenas a mensagem do erro.

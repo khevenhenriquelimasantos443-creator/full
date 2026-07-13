@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<style>
+  :root { --bg:#0b1220; --surface:#141c2b; --border:#26324a; --text:#f2f5fa; --muted:#98a4bc; --primary:#3b82f6; --accent:#22d3a6; }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 28px; max-width: 560px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.sub { color: var(--muted); margin: 0 0 20px; font-size: 14px; line-height: 1.5; }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 16px 0 6px; }
+  .hint { color: var(--muted); font-weight: 400; font-size: 12px; }
+  input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); padding: 12px 14px; font-size: 14px; }
+  button { margin-top: 22px; background: var(--primary); color: #fff; border: 0; border-radius: 10px; padding: 12px 20px; font-weight: 700; font-size: 14px; cursor: pointer; }
+  .ok { color: var(--accent); margin-left: 12px; font-size: 13px; }
+  .box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; color: var(--muted); font-size: 12.5px; line-height: 1.5; margin-top: 20px; }
+</style>
+</head>
+<body>
+  <h1>Coleta Full — configuração</h1>
+  <p class="sub">Opcional. Sem preencher nada, a extensão já mostra o código e os
+    envios no popup. Preencha abaixo para também <b>enviar os dados ao app</b>
+    (backend), e o celular passar a ver os mesmos dados.</p>
+
+  <label>Endereço do backend <span class="hint">(ex.: https://coleta-full-backend.xxx.workers.dev)</span></label>
+  <input id="backendUrl" placeholder="https://..." />
+
+  <label>Token de sessão do app <span class="hint">(gerado ao conectar sua conta no app)</span></label>
+  <input id="appToken" placeholder="ey..." />
+
+  <label>ID da conta <span class="hint">(accountId da conta ML no app)</span></label>
+  <input id="accountId" placeholder="uuid da conta" />
+
+  <div>
+    <button id="save">Salvar</button>
+    <span class="ok" id="ok"></span>
+  </div>
+
+  <div class="box">Os dados ficam só no seu navegador (armazenamento da extensão).
+    O token dá acesso à sua conta no app — trate como senha.</div>
+
+  <script src="options.js"></script>
+</body>
+</html>

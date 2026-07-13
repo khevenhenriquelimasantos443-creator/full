@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<style>
+  :root {
+    --bg: #0b1220; --surface: #141c2b; --surface-alt: #1c2739; --border: #26324a;
+    --text: #f2f5fa; --muted: #98a4bc; --primary: #3b82f6; --accent: #22d3a6;
+    --warning: #f5a524; --danger: #f04438; --code: #0e7c66;
+  }
+  * { box-sizing: border-box; }
+  body { width: 360px; margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; }
+  header { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  header .title { font-weight: 800; font-size: 15px; }
+  header .cfg { color: var(--primary); font-size: 12px; cursor: pointer; background: none; border: 0; }
+  .body { padding: 14px; max-height: 460px; overflow-y: auto; }
+
+  .codecard { background: var(--code); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+  .codecard .lab { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.85); font-weight: 700; }
+  .code { text-align: center; font-size: 40px; font-weight: 800; letter-spacing: 5px; color: #fff; padding: 8px 0 2px; font-variant-numeric: tabular-nums; cursor: pointer; }
+  .code.small { font-size: 20px; letter-spacing: 1px; }
+  .code-hint { text-align: center; color: rgba(255,255,255,.8); font-size: 11px; }
+
+  .msg { padding: 16px; text-align: center; color: var(--muted); line-height: 1.5; }
+  .btn { display: block; width: 100%; border: 0; border-radius: 10px; padding: 12px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit; }
+  .btn-primary { background: var(--primary); color: #fff; margin-top: 10px; }
+  .btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); margin-top: 8px; }
+
+  .count { font-weight: 700; margin: 4px 0 8px; }
+  .ship { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+  .ship .row { display: flex; justify-content: space-between; gap: 8px; }
+  .ship .name { font-weight: 700; }
+  .ship .pill { background: var(--surface-alt); color: var(--accent); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 7px; white-space: nowrap; }
+  .ship .meta { color: var(--muted); font-size: 12px; margin-top: 5px; }
+  .ship .beta { color: var(--muted); font-size: 12px; margin-top: 3px; }
+
+  .warn { background: var(--surface-alt); border-left: 3px solid var(--warning); color: var(--muted); font-size: 11px; padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; line-height: 1.4; }
+  .status { text-align: center; font-size: 12px; color: var(--muted); margin-top: 8px; min-height: 16px; }
+  .spinner { border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; width: 26px; height: 26px; animation: spin 1s linear infinite; margin: 24px auto; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+  <header>
+    <span class="title">Coleta Full</span>
+    <button class="cfg" id="cfg">Configurar</button>
+  </header>
+  <div class="body" id="body">
+    <div class="spinner"></div>
+  </div>
+  <script src="collector.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
