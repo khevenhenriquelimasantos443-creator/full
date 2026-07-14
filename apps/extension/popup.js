@@ -9,6 +9,7 @@ const body = document.getElementById("body");
 document.getElementById("cfg").onclick = () => chrome.runtime.openOptionsPage();
 
 let lastData = null;
+let showAll = false;
 
 function esc(s) {
   return String(s ?? "").replace(/[&<>"]/g, (c) =>
@@ -48,7 +49,10 @@ function timeOf(iso) {
 function render(data) {
   lastData = data;
   const code = data.code;
-  const ships = data.shipments || [];
+  const all = data.shipments || [];
+  const doDia = all.filter((s) => s.hoje);
+  const ships = showAll ? all : doDia;
+
   const cards = ships
     .map((s) => {
       const beta =
@@ -59,21 +63,37 @@ function render(data) {
               s.horarioDe ? ` · ${esc(s.horarioDe)}–${esc(s.horarioAte)}` : ""
             }</div>`
           : "";
+      const dia = !s.hoje && s.dataColeta ? ` · coleta ${esc(s.dataColeta.split("-").reverse().slice(0, 2).join("/"))}` : "";
       return `
       <div class="ship">
         <div class="row"><span class="name">${esc(s.name || "Envio " + s.inboundId)}</span>
           <span class="pill">${esc(s.status || "—")}</span></div>
-        <div class="meta">ID ${s.inboundId}${s.volumes ? ` · ${s.volumes} volumes` : ""}${
-          s.scheduledDate ? ` · ${timeOf(s.scheduledDate)}` : ""
-        }</div>
+        <div class="meta">ID ${s.inboundId}${s.volumes ? ` · ${s.volumes} vol.` : ""}${
+          s.scheduledDate ? ` · coleta ${timeOf(s.scheduledDate)}` : ""
+        }${dia}</div>
         ${beta}
       </div>`;
     })
     .join("");
 
+  const titulo = showAll
+    ? `Todos os envios (${all.length})`
+    : `Envios de hoje (${doDia.length})`;
+  const toggle =
+    all.length > doDia.length
+      ? `<button class="btn btn-ghost" id="toggle">${
+          showAll ? `Mostrar só os de hoje` : `Ver todos (${all.length})`
+        }</button>`
+      : "";
+  const vazioHoje =
+    !showAll && doDia.length === 0
+      ? `<div class="msg">Nenhum envio com coleta hoje (${esc(data.dateRef || "")}).${
+          all.length ? " Toque em “Ver todos” abaixo." : ""
+        }</div>`
+      : "";
   const parcial =
     data.total && data.lidos && data.total > data.lidos
-      ? `<div class="status">Mostrando ${data.lidos} de ${data.total} envios.</div>`
+      ? `<div class="status">Li os ${data.lidos} envios mais recentes de ${data.total}.</div>`
       : "";
 
   body.innerHTML = `
@@ -84,16 +104,21 @@ function render(data) {
              <div class="code" id="code">${esc(code)}</div>
              <div class="code-hint">clique para copiar</div>
            </div>`
-        : `<div class="warn">Nenhum código de autorização encontrado hoje. Ele costuma
-             aparecer mais perto da coleta — tente de novo mais tarde.</div>`
+        : `<div class="warn">Nenhum código de autorização ainda. Ele aparece quando o
+             envio se aproxima da coleta (os seus estão em preparação).</div>`
     }
     <div class="warn">Dados lidos da sua sessão do Mercado Livre (não-oficial).</div>
-    <div class="count">Envios de hoje (${ships.length})</div>
-    ${cards || '<div class="msg">Nenhum envio encontrado.</div>'}
+    <div class="count">${titulo}</div>
+    ${vazioHoje}
+    ${cards}
+    ${toggle}
     ${parcial}
     <button class="btn btn-primary" id="send">Enviar para o app</button>
     <button class="btn btn-ghost" id="refresh">Atualizar</button>
     <div class="status" id="status"></div>`;
+
+  const tg = document.getElementById("toggle");
+  if (tg) tg.onclick = () => { showAll = !showAll; render(lastData); };
 
   const codeEl = document.getElementById("code");
   if (codeEl)

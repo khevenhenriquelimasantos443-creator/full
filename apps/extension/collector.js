@@ -85,6 +85,27 @@ async function collectInPage(opts) {
     const headers = { accept: "application/json" };
     if (csrf) headers["x-csrf-token"] = csrf;
 
+    // Data de hoje (America/Sao_Paulo) e helper para a data de coleta de cada envio.
+    const dateRef = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    function spDate(iso) {
+      if (!iso) return null;
+      try {
+        return new Intl.DateTimeFormat("en-CA", {
+          timeZone: "America/Sao_Paulo",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date(iso));
+      } catch (e) {
+        return null;
+      }
+    }
+
     // 1) Lista de inbounds (§1.1).
     let list = [];
     try {
@@ -145,12 +166,15 @@ async function collectInPage(opts) {
         );
         const token = log.handshakeToken || null;
         if (token && !code) code = token;
+        const dataColeta = spDate(appt.scheduledDate);
         shipments[my] = {
           inboundId: it.inboundId,
           name: (view && view.name) || it.name || null,
           status: (view && view.status) || it.status || null,
           subStatus: (view && view.subStatus) || null,
           scheduledDate: appt.scheduledDate || null,
+          dataColeta,
+          hoje: dataColeta ? dataColeta === dateRef : false,
           volumes: volumes || null,
           transportadora: tr.carrierName || null,
           motorista: tr.driverName || null,
@@ -164,13 +188,6 @@ async function collectInPage(opts) {
 
     const concurrency = Math.min(5, targets.length) || 1;
     await Promise.all(Array.from({ length: concurrency }, worker));
-
-    const dateRef = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "America/Sao_Paulo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
 
     return {
       ok: true,
